@@ -77,6 +77,16 @@ class Log extends AbstractLogger
     }
 
     /**
+     * Append a raw string to the file;
+     *
+     * @param string $contents
+     */
+    public function rawStr($contents)
+    {
+        $this->writeToFile(PHP_EOL.$contents.PHP_EOL);
+    }
+
+    /**
      * Save the log contents to a file.
      *
      * @param $filePath
