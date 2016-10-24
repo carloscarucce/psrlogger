@@ -63,7 +63,17 @@ class Log extends AbstractLogger
         $levelName = $this->getLogLevelAsString($level);
 
         $message = "$currentTime ][$levelName] $message".PHP_EOL;
-        file_put_contents($this->file, $message, FILE_APPEND);
+        $this->writeToFile($message);
+    }
+
+    /**
+     * Appends line breaks to the log.
+     *
+     * @param int $lines
+     */
+    public function nl($lines = 1)
+    {
+        $this->writeToFile(str_repeat(PHP_EOL, $lines));
     }
 
     /**
@@ -77,15 +87,15 @@ class Log extends AbstractLogger
      */
     public function saveTo($filePath)
     {
-        $success = null;
-
         //Check if was saved already
         if ($this->savedAsFile) {
-            throw new \Exception('Log was saved before.');
+            throw new \Exception('Log may only be saved once.');
         }
 
         //Attempt to move file
-        if ($success = rename($this->file, $filePath)) {
+        $success = rename($this->file, $filePath);
+        if ($success) {
+            $this->file = $filePath;
             $this->savedAsFile = true;
         }
 
@@ -112,32 +122,32 @@ class Log extends AbstractLogger
         switch ($logLevel) {
             case LogLevel::EMERGENCY:
                 $levelName = 'EMERGENCY';
-            break;
+                break;
             case LogLevel::ALERT:
                 $levelName = 'ALERT';
-            break;
+                break;
             case LogLevel::CRITICAL:
                 $levelName = 'CRITICAL';
-            break;
+                break;
             case LogLevel::ERROR:
                 $levelName = 'ERROR';
-            break;
+                break;
             case LogLevel::WARNING:
                 $levelName = 'WARNING';
-            break;
+                break;
             case LogLevel::NOTICE:
                 $levelName = 'NOTICE';
-            break;
+                break;
             case LogLevel::DEBUG:
                 $levelName = 'DEBUG';
-            break;
+                break;
             case LogLevel::INFO:
             default:
                 $levelName = 'INFO';
-            break;
+                break;
         }
 
-        return '['.$levelName.']';
+        return $levelName;
     }
 
     /**
@@ -148,7 +158,8 @@ class Log extends AbstractLogger
         // Create a temporary file in the temporary
         // files directory using sys_get_temp_dir()
         $this->file = tempnam(sys_get_temp_dir(), 'LOG');
-        $this->info('Log created at '.date($this->options['dateFormat']).PHP_EOL);
+        $this->info('Log created at '.date($this->options['dateFormat']));
+        $this->nl();
     }
 
     /**
@@ -163,6 +174,14 @@ class Log extends AbstractLogger
             return true;
 
         return unlink($this->file);
+    }
+
+    /**
+     * @param $contents
+     */
+    private function writeToFile($contents)
+    {
+        file_put_contents($this->file, $contents, FILE_APPEND);
     }
 
     /**
