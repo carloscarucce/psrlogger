@@ -172,8 +172,6 @@ class Log extends AbstractLogger
         // Create a temporary file in the temporary
         // files directory using sys_get_temp_dir()
         $this->file = tempnam(sys_get_temp_dir(), 'LOG');
-        $this->info('Log created at '.date($this->options['dateFormat']));
-        $this->nl();
     }
 
     /**
