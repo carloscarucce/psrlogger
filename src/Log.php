@@ -45,9 +45,7 @@ class Log extends AbstractLogger
      */
     public function log($level, $message, array $context = array())
     {
-        if (is_null($this->file)) {
-            $this->createTempFile();
-        }
+        $this->createTempFile();
 
         //Transform objects into arrays
         if (is_object($message)) {
@@ -83,6 +81,8 @@ class Log extends AbstractLogger
      */
     public function rawStr($contents)
     {
+        $this->createTempFile();
+
         $this->writeToFile(PHP_EOL.$contents.PHP_EOL);
     }
 
@@ -165,6 +165,10 @@ class Log extends AbstractLogger
      */
     private function createTempFile()
     {
+        if (!is_null($this->file)) {
+            return;
+        }
+
         // Create a temporary file in the temporary
         // files directory using sys_get_temp_dir()
         $this->file = tempnam(sys_get_temp_dir(), 'LOG');
